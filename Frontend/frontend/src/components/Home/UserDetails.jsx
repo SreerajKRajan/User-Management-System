@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const UserDetails = () => {
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState({
+    username: "",
+    email: "",
+    profile_image: "",
+  });
   const [profileImage, setProfileImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState('');  // State to handle the updated image URL
+  const [imageUrl, setImageUrl] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedUser, setUpdatedUser] = useState({ username: "", email: "" });
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://127.0.0.1:8000/api/user-details/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/user-details/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("User data:", response.data);
         setUserData(response.data);
-        setImageUrl(response.data.profile_image); // Set initial image URL
+        setImageUrl(response.data.profile_image);
+        setUpdatedUser({
+          username: response.data.username,
+          email: response.data.email,
+        });
       } catch (error) {
-        console.error('Error fetching user details', error);
+        console.error("Error fetching user details", error);
       }
     };
 
@@ -29,42 +43,144 @@ const UserDetails = () => {
 
   const handleImageUpload = async (e) => {
     e.preventDefault();
+
+    if (!profileImage) {
+      alert("Please select an image to upload");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('profile_image', profileImage);
+    formData.append("profile_image", profileImage);
+    formData.append("username", updatedUser.username);
+    formData.append("email", updatedUser.email);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put('http://127.0.0.1:8000/api/user-details/', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      alert('Profile image updated successfully!');
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://127.0.0.1:8000/api/user-details/",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      // Cache-busting: Update the image URL with a timestamp to avoid caching
-      setImageUrl(`${response.data.profile_image}?timestamp=${new Date().getTime()}`);
+      alert("Profile updated successfully!");
+      setImageUrl(
+        `${response.data.profile_image}?timestamp=${new Date().getTime()}`
+      );
+      setUpdatedUser({
+        username: response.data.user.username,
+        email: response.data.user.email,
+      });
     } catch (error) {
-      console.error('Error uploading profile image', error);
+      console.error("Error uploading profile image", error);
+    }
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://127.0.0.1:8000/api/user-details/",
+        updatedUser,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Profile updated successfully!");
+      setUserData(response.data.user);
+      setImageUrl(response.data.profile_image);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile", error);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-semibold mb-4">User Details</h1>
-      <div className="mb-4">
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <div className="text-center mb-6">
         <img
-          src={imageUrl ? imageUrl : '/default-profile.png'} // Updated to use the imageUrl state
+          src={imageUrl ? imageUrl : "/default-profile.png"}
           alt="Profile"
-          className="w-32 h-32 object-cover rounded-full"
+          className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
         />
-      </div>
-      <form onSubmit={handleImageUpload}>
-        <input type="file" onChange={handleImageChange} className="mb-4" />
-        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">
-          Upload Profile Image
+        <input
+          type="file"
+          onChange={handleImageChange}
+          className="block mx-auto mb-4"
+        />
+        <button
+          className="bg-blue-500 text-white py-2 px-4 rounded"
+          onClick={handleImageUpload}
+        >
+          Upload New Image
         </button>
-      </form>
+      </div>
+
+      <div className="text-center">
+        {!isEditing ? (
+          <>
+            <p className="text-lg mb-2">
+              {userData.username || "Loading username..."}
+            </p>
+            <p className="text-gray-600 mb-4">
+              {userData.email || "Loading email..."}
+            </p>
+            <button
+              onClick={handleEditToggle}
+              className="bg-yellow-500 text-white py-2 px-4 rounded"
+            >
+              Edit Profile
+            </button>
+          </>
+        ) : (
+          <form>
+            <div className="mb-4">
+              <label className="block text-left mb-1">Username</label>
+              <input
+                type="text"
+                value={updatedUser.username}
+                onChange={(e) =>
+                  setUpdatedUser({ ...updatedUser, username: e.target.value })
+                }
+                className="border rounded px-3 py-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-left mb-1">Email</label>
+              <input
+                type="email"
+                value={updatedUser.email}
+                onChange={(e) =>
+                  setUpdatedUser({ ...updatedUser, email: e.target.value })
+                }
+                className="border rounded px-3 py-2 w-full"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-green-500 text-white py-2 px-4 rounded"
+              onClick={handleUpdateProfile}
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={handleEditToggle}
+              className="bg-red-500 text-white py-2 px-4 rounded ml-4"
+            >
+              Cancel
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

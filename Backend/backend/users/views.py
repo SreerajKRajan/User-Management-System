@@ -13,7 +13,6 @@ from .serializers import AdminUserSerializer
 from rest_framework.permissions import IsAdminUser
 
 
-
 class SignupView(APIView):
     def post(self, request):
         username = request.data.get('username')
@@ -23,7 +22,6 @@ class SignupView(APIView):
         if not username or not email or not password:
             return Response({"error": "Please provide all required fields."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the user already exists
         if User.objects.filter(username=username).exists():
             return Response({"error": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(email=email).exists():
@@ -73,11 +71,28 @@ class UserDetailsView(APIView):
     def put(self, request, *args, **kwargs):
         try:
             user_profile = UserProfile.objects.get(user=request.user)
+            user = request.user
+
+            user.username = request.data.get('username', user.username)
+            user.email = request.data.get('email', user.email)
+            user.save()
+
+            if 'profile_image' in request.FILES:
+                user_profile.profile_image = request.FILES['profile_image']
+
             serializer = UserProfileSerializer(user_profile, data=request.data, partial=True, context={'request': request})
+
             if serializer.is_valid():
-                serializer.save()  # Save the updated profile
-                return Response(serializer.data)  # Return the updated data
+                serializer.save()
+                return Response({
+                    "user": {
+                        "username": user.username,
+                        "email": user.email
+                    },
+                    "profile_image": serializer.data.get('profile_image')
+                })
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         except UserProfile.DoesNotExist:
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 

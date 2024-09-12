@@ -24,7 +24,7 @@ const Signup = () => {
       .unwrap()
       .then((response) => {
         localStorage.setItem("token", response.token);
-        localStorage.setItem("username", response.username);        
+        localStorage.setItem("username", response.username);
         alert("Signup successful! Please log in.");
         navigate("/login");
       })

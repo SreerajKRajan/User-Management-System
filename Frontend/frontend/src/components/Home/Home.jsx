@@ -8,19 +8,19 @@ const Home = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate("/login"); 
+      navigate("/login");
     } else {
       const storedUsername = localStorage.getItem("username");
-      if (storedUsername){
+      if (storedUsername) {
         setUsername(storedUsername);
       }
     }
   }, [navigate, token]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    localStorage.removeItem("username")
-    navigate("/login"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/login");
   };
 
   return (
@@ -29,7 +29,12 @@ const Home = () => {
         <h1 className="text-3xl font-semibold">Home Page</h1>
         <div className="flex items-center space-x-4">
           <span className="text-xl">Welcome {username}!</span>
-          <button onClick={() => {navigate("/user-details")}} className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow transition duration-300">
+          <button
+            onClick={() => {
+              navigate("/user-details");
+            }}
+            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-lg shadow transition duration-300"
+          >
             User Details
           </button>
           <button
