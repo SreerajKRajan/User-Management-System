@@ -99,13 +99,30 @@ class UserDetailsView(APIView):
 
 
 
-class AdminLoginView(TokenObtainPairView):
+class AdminLoginView(APIView):
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        # Check if the user is a superuser or staff
-        user = self.request.user
-        if user.is_superuser or user.is_staff:
-            return response
-        return Response({"detail": "Admin access only"}, status=status.HTTP_403_FORBIDDEN)
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None and user.is_staff:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            })
+        return Response({"error": "Invalid credentials or not authorized"}, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminUserListView(APIView):
+    permission_classes = [IsAdminUser]  # Only admin users can access this
+
+    def get(self, request, *args, **kwargs):
+        try:
+            users = User.objects.all()  # Get all users
+            serializer = AdminUserSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
