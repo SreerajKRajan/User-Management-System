@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
   const [username, setUsername] = useState("");
 
   useEffect(() => {
@@ -11,6 +12,7 @@ const Home = () => {
       navigate("/login");
     } else {
       const storedUsername = localStorage.getItem("username");
+      console.log("username", storedUsername);
       if (storedUsername) {
         setUsername(storedUsername);
       }

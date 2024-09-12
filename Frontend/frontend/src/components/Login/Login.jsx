@@ -18,6 +18,7 @@ const Login = () => {
       .then((response) => {
         localStorage.setItem("token", response.access);
         localStorage.setItem("refresh_token", response.refresh);
+        localStorage.setItem("username", username)
         alert("Login successful!");
         navigate("/", { replace: true });
       })
