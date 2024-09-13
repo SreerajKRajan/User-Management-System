@@ -17,7 +17,7 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       const resultAction = await dispatch(loginUser({ username, password }));
-      if (loginUser.fulfilled.match(resultAction)) {
+      if (loginUser.fulfilled) {
         dispatch(setAuthenticated(true));
         navigate("/admin-dashboard", { replace: true });
       } else {

@@ -105,84 +105,90 @@ const UserDetails = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-    <div className="max-w-lg mx-auto p-6 bg-black shadow-lg rounded-lg">
-      <div className="text-center mb-6">
-        <img
-          src={imageUrl ? imageUrl : "/default-profile.png"}
-          alt="Profile"
-          className="w-24 h-24 object-cover rounded-full mx-auto mb-4"
-        />
-        <input
-          type="file"
-          onChange={handleImageChange}
-          className="block mx-auto mb-4"
-        />
-        <button
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-          onClick={handleImageUpload}
-        >
-          Upload New Image
-        </button>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-200 p-6">
+      <div className="max-w-md w-full bg-white p-8 shadow-lg rounded-lg border border-gray-300">
+        <div className="text-center mb-6">
+          <img
+            src={imageUrl ? imageUrl : "/default-profile.png"}
+            alt="Profile"
+            className="w-32 h-32 object-cover rounded-full mx-auto mb-4 border-4 border-blue-500 shadow-md"
+          />
+          <input
+            type="file"
+            onChange={handleImageChange}
+            className="block mx-auto mb-4 cursor-pointer file:bg-blue-500 file:text-white file:border-none file:rounded-full file:py-2 file:px-4 file:shadow-lg hover:file:bg-blue-600"
+          />
+          <button
+            className="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-6 rounded-full shadow-lg hover:scale-105 transition-transform"
+            onClick={handleImageUpload}
+          >
+            Upload New Image
+          </button>
+        </div>
 
-      <div className="text-center">
-        {!isEditing ? (
-          <>
-            <p className="text-gray-600 mb-2">
-              {userData.username || "Loading username..."}
-            </p>
-            <p className="text-gray-600 mb-4">
-              {userData.email || "Loading email..."}
-            </p>
-            <button
-              onClick={handleEditToggle}
-              className="bg-yellow-500 text-white py-2 px-4 rounded"
-            >
-              Edit Profile
-            </button>
-          </>
-        ) : (
-          <form>
-            <div className="mb-4">
-              <label className="block text-left mb-1">Username</label>
-              <input
-                type="text"
-                value={updatedUser.username}
-                onChange={(e) =>
-                  setUpdatedUser({ ...updatedUser, username: e.target.value })
-                }
-                className="border rounded px-3 py-2 w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-left mb-1">Email</label>
-              <input
-                type="email"
-                value={updatedUser.email}
-                onChange={(e) =>
-                  setUpdatedUser({ ...updatedUser, email: e.target.value })
-                }
-                className="border rounded px-3 py-2 w-full"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-green-500 text-white py-2 px-4 rounded"
-              onClick={handleUpdateProfile}
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={handleEditToggle}
-              className="bg-red-500 text-white py-2 px-4 rounded ml-4"
-            >
-              Cancel
-            </button>
-          </form>
-        )}
+        <div className="text-center">
+          {!isEditing ? (
+            <>
+              <p className="text-lg font-semibold text-gray-700 mb-1">
+                {userData.username || "Loading username..."}
+              </p>
+              <p className="text-gray-600 mb-4 italic">
+                {userData.email || "Loading email..."}
+              </p>
+              <button
+                onClick={handleEditToggle}
+                className="bg-yellow-500 text-white py-2 px-6 rounded-full shadow-lg hover:scale-105 transition-transform"
+              >
+                Edit Profile
+              </button>
+            </>
+          ) : (
+            <form className="space-y-4">
+              <div>
+                <label className="block text-left text-gray-700 font-semibold mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={updatedUser.username}
+                  onChange={(e) =>
+                    setUpdatedUser({ ...updatedUser, username: e.target.value })
+                  }
+                  className="border border-gray-300 rounded-full px-4 py-2 w-full shadow-sm focus:ring focus:ring-blue-200"
+                />
+              </div>
+              <div>
+                <label className="block text-left text-gray-700 font-semibold mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={updatedUser.email}
+                  onChange={(e) =>
+                    setUpdatedUser({ ...updatedUser, email: e.target.value })
+                  }
+                  className="border border-gray-300 rounded-full px-4 py-2 w-full shadow-sm focus:ring focus:ring-blue-200"
+                />
+              </div>
+              <div className="flex justify-center space-x-4">
+                <button
+                  type="submit"
+                  className="bg-green-500 text-white py-2 px-6 rounded-full shadow-lg hover:scale-105 transition-transform"
+                  onClick={handleUpdateProfile}
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={handleEditToggle}
+                  className="bg-red-500 text-white py-2 px-6 rounded-full shadow-lg hover:scale-105 transition-transform"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 };
