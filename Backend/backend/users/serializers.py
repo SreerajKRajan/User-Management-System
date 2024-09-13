@@ -17,6 +17,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(obj.profile_image.url)
         return None
 
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user = instance.user
+
+        user.username = user_data.get('username', user.username)
+        user.email = user_data.get('email', user.email)
+        user.save()
+
+        profile_image = validated_data.get('profile_image', None)
+        if profile_image:
+            instance.profile_image = profile_image
+
+        instance.save()
+        return instance
+
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

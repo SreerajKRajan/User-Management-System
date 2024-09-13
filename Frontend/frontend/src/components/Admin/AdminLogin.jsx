@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../../redux/actions/authActions'; 
-import { setAuthenticated } from '../../redux/slices/adminAuthSlice';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../redux/actions/authActions";
+import { setAuthenticated } from "../../redux/slices/adminAuthSlice";
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { loading } = useSelector((state) => state.auth);
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,12 +19,12 @@ const AdminLogin = () => {
       const resultAction = await dispatch(loginUser({ username, password }));
       if (loginUser.fulfilled.match(resultAction)) {
         dispatch(setAuthenticated(true));
-        navigate('/admin-dashboard', { replace: true });
+        navigate("/admin-dashboard", { replace: true });
       } else {
-        setError('Invalid credentials');
+        setError("Invalid credentials");
       }
     } catch (err) {
-      setError('Login failed');
+      setError("Login failed");
     }
   };
 

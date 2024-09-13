@@ -105,7 +105,8 @@ const UserDetails = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="min-h-screen flex items-center justify-center">
+    <div className="max-w-lg mx-auto p-6 bg-black shadow-lg rounded-lg">
       <div className="text-center mb-6">
         <img
           src={imageUrl ? imageUrl : "/default-profile.png"}
@@ -128,7 +129,7 @@ const UserDetails = () => {
       <div className="text-center">
         {!isEditing ? (
           <>
-            <p className="text-lg mb-2">
+            <p className="text-gray-600 mb-2">
               {userData.username || "Loading username..."}
             </p>
             <p className="text-gray-600 mb-4">
@@ -181,6 +182,7 @@ const UserDetails = () => {
           </form>
         )}
       </div>
+    </div>
     </div>
   );
 };

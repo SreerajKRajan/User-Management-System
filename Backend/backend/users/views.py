@@ -11,6 +11,8 @@ from .serializers import UserProfileSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import AdminUserSerializer
 from rest_framework.permissions import IsAdminUser
+from django.contrib.auth.hashers import make_password
+
 
 
 class SignupView(APIView):
@@ -124,5 +126,48 @@ class AdminUserListView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class AdminEditUserView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def put(self, request, user_id, *args, **kwargs):
+        try:
+            user = User.objects.get(id=user_id)
+            data = request.data
+
+            user.username = data.get('username', user.username)
+            user.email = data.get('email', user.email)
+            user.is_active = data.get('is_active', user.is_active)
+            user.save()
+
+            serializer = AdminUserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def create_user(request):
+    data = request.data
+    try:
+        user = User.objects.create(
+            username=data['username'],
+            email=data['email'],
+            password=make_password(data['password'])
+        )
+        return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_user(request, pk):
+    try:
+        user = User.objects.get(pk=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
